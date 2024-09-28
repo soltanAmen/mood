@@ -1,5 +1,5 @@
 import { assets } from "../assets/images/assets.js";
-import { Subsicribe } from "../components";
+import { Subsicribe, Banner } from "../components";
 const Contact = () => {
   return (
     <div
@@ -14,13 +14,7 @@ const Contact = () => {
     
     "
     >
-      <div className="bg-banner bg-cover bg-bottom h-44 mt-0 w-full">
-        <div className=" bg-gray-900 w-full h-full bg-opacity-25 flex justify-center items-center">
-          <h1 className="text-5xl font-bold font-first text-white">
-            Contuct Us
-          </h1>
-        </div>
-      </div>
+      <Banner img={"bg-contact"} title={"Contact"} />
       <div className="flex items-center justify-center w-full py-32 max-md:flex-col-reverse gap-16 mt-10 px-10">
         <img
           src={assets.contact_img}

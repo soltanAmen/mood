@@ -1,33 +1,41 @@
 import express from "express";
+import User from "./models/userModel.js";
+import Order from "./models/orderModel.js";
+import Product from "./models/productModel.js";
+import userRoute from "./Routes/userRoute.js";
+//import orderRoute from "./Routes/orderRoute.js";
+import productRoute from "./Routes/productRoute.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import bodyParser from "body-parser";
-import bcrypt from "bcryptjs";
-import userRoute from "./routes/userRoute.js";
-//import productRoute from "./routes/productRoute.js";
-//import orderRoute from "./routes/orderRoute.js";
 
-import User from "./models/userModel.js";
-import Product from "./models/productModel.js";
-import Order from "./models/orderModel.js";
-//import data from "./data.js";
-
-const app = express();
 dotenv.config();
-app.use(cors());
-app.use(bodyParser.json());
-app.use("/users", userRoute);
-//app.use("/products", productRoute);
-//app.use("/orders", orderRoute);
+const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+app.use("/users", userRoute);
+app.use("/products", productRoute);
+app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.send("Hello, world!");
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB
+mongoose.connect(process.env.mongoURI);
+mongoose.connection.on("connected", () => {
+  console.log("Connected to MongoDB");
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });
-
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+mongoose.connection.on("error", (err) => {
+  console.log("Error connecting to MongoDB", err);
 });

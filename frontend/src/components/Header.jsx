@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { SideBarContext } from "../context/SideBarContext";
-
+import { CartContext } from "../context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SearchContext } from "../context/SearchContext";
 import { faHeart, faUser } from "@fortawesome/free-regular-svg-icons";
 import {
   faSearch,
@@ -10,22 +11,56 @@ import {
   faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
+import SideMenue from "./SideMenue";
 
 const Header = () => {
+  const { searchText, setSearchText } = useContext(SearchContext);
+  const { cartCount } = useContext(CartContext);
   const { isSideBarOpen, setIsSideBarOpen } = useContext(SideBarContext);
   const [search, setSearch] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [show, setShow] = useState(true);
   const location = useLocation();
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY === 0) {
+        setShow(true);
+      }
+      if (currentScrollY > lastScrollY) {
+        setShow(false);
+      } else {
+        setShow(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+  useEffect;
   useEffect(() => {
     setSearch(false);
     setIsSideBarOpen(false);
+    setSearchText("");
   }, [location, setIsSideBarOpen]);
+  useEffect(() => {
+    setSearch(false);
+  }, [isSideBarOpen]);
+  const handileChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
   return (
-    <div>
-      <header className="header ">
-        <div className="logo  text-3xl font-bold font-first text-gray-800  cursor-pointer max-md:text-2xl mr-2">
+    <div
+      className={`      font-second fixed  flex flex-col justify-center h-44 items-center px-4  top-0 left-0 w-full z-[50]   transition-all   duration-300   ease-in-out ${
+        show ? "translate-y-0" : "-translate-y-full"
+      } `}
+    >
+      <header className={`header bg-white z-[55]`}>
+        <div className="logo  text-4xl font-bold font-first text-gray-800  cursor-pointer max-md:text-3xl mr-2">
           <Link to="/">MOOD.</Link>
         </div>
-        <nav className=" hidden md:flex items-center gap-8  ml-5 mr-5  ">
+        <nav className=" hidden md:flex items-center gap-8  ml-5 mr-5  text-lg ">
           <Link
             className={location.pathname === "/" ? "page-link" : "link"}
             to="/"
@@ -57,7 +92,9 @@ const Header = () => {
             <input
               type="text"
               placeholder="Search..."
-              className="max-lg:hidden max-md:h-8 border-none focus:outline-none focus:ring-0 max-md:pl-2 max-md:pr-2 max-md:rounded-full       max-md:text-sm    max-md:ml-2    max-md:mr-2 "
+              className="max-lg:hidden font-third max-md:h-8 border-none focus:outline-none focus:ring-0 max-md:pl-2 max-md:pr-2 max-md:rounded-full       max-md:text-sm    max-md:ml-2    max-md:mr-2 "
+              value={searchText}
+              onChange={handileChange}
             />
             <FontAwesomeIcon icon={faSearch} className="max-lg:hidden" />
             <FontAwesomeIcon
@@ -76,9 +113,11 @@ const Header = () => {
               <FontAwesomeIcon icon={faUser} />
             </Link>
             <div className=" relative cursor-pointer">
-              <FontAwesomeIcon icon={faShoppingCart} />
-              <span className="cart-count absolute -top-2 -right-2 bg-accent text-primary w-4 h-4 text-xs  text-center  rounded-full flex items-center justify-center">
-                0
+              <Link to="/cart">
+                <FontAwesomeIcon icon={faShoppingCart} />
+              </Link>
+              <span className="cart-count absolute -top-2 -right-2 bg-accent px-2 py-2 text-primary w-4 h-4 text-xs  text-center  rounded-full flex items-center justify-center">
+                {cartCount}
               </span>
             </div>
           </div>
@@ -88,86 +127,39 @@ const Header = () => {
               icon={faBars}
               onClick={() => setIsSideBarOpen(!isSideBarOpen)}
             />
-            <div className={isSideBarOpen ? "show" : "hide"}>
-              <div
-                className="
-              flex
-              justify-between
-              items-center
-              p-4
-
-            "
-              >
-                <h1 className="text-2xl font-bold font-first text-gray-800 cursor-pointer">
-                  <Link to="/">MOOD.</Link>
-                </h1>
-                <FontAwesomeIcon
-                  icon={faX}
-                  onClick={() => setIsSideBarOpen(!isSideBarOpen)}
-                  className={
-                    isSideBarOpen ? "absolute right-3 cursor-pointer" : "hidden"
-                  }
-                />
-              </div>
-
-              <nav
-                className=" side flex flex-col gap-4 m-auto mt-44 text-center text-3xl
-            "
-              >
-                <Link
-                  to="/"
-                  className={location.pathname === "/" ? "page-link" : "link"}
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/shop"
-                  className={
-                    location.pathname === "/shop" ? "page-link" : "link"
-                  }
-                >
-                  Shop
-                </Link>
-                <Link
-                  to="/about"
-                  className={
-                    location.pathname === "/about" ? "page-link" : "link"
-                  }
-                >
-                  About
-                </Link>
-                <Link
-                  to="/contact"
-                  className={
-                    location.pathname === "/contact" ? "page-link" : "link"
-                  }
-                >
-                  Contact
-                </Link>
-              </nav>
-            </div>
+            <SideMenue
+              setIsSideBarOpen={setIsSideBarOpen}
+              isSideBarOpen={isSideBarOpen}
+            />
           </div>
         </div>
       </header>
+
       <div
         className={
           search
-            ? "px-10 absolute bg-white w-full flex max-h-60 items-center z-50 gap-4 transition-all duration-300 ease-in-out overflow-hidden"
-            : "px-10 absolute bg-white w-full  flex max-h-0 items-center z-50 gap-4 overflow-hidden transition-all   duration-300 ease-in-out"
+            ? "px-10 absolute bg-white w-full flex max-h-60 translate-y-0 items-center z-[55] gap-4 transition-all duration-300 ease-in-out overflow-hidden"
+            : "px-10 absolute bg-white w-full  flex max-h-60 -translate-y-40 items-center z-[50] gap-4 overflow-hidden transition-all   duration-300 ease-in-out"
         }
       >
         <div className="search    my-4   px-4   w-full   m-auto flex items-center justify-center border gap- rounded-full ">
           <input
             type="text"
+            autoFocus={true}
             placeholder="Search..."
-            className="w-full border  py-3 border-none focus:outline-none focus:ring-0 pl-2 pr-2 rounded-full text-sm ml-2 mr-2"
+            className="w-full border font-third  py-3 border-none focus:outline-none focus:ring-0 pl-2 pr-2 rounded-full text-sm ml-2 mr-2"
+            value={searchText}
+            onChange={handileChange}
           />
           <FontAwesomeIcon icon={faSearch} className="h-4 w-4 cursor-pointer" />
         </div>
         <FontAwesomeIcon
           icon={faX}
           className="cursor-pointer h-4 w-4"
-          onClick={() => setSearch(!search)}
+          onClick={() => {
+            setSearch(false);
+            setSearchText("");
+          }}
         />
       </div>
     </div>
