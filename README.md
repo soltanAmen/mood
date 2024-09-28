@@ -21,4 +21,4 @@ MOOD is a modern e-commerce platform for a premium clothing brand. The website p
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/mood.git
+   git clone https://github.com/soltanAmen/mood.git
